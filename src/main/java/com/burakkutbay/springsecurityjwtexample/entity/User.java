@@ -1,6 +1,7 @@
 package com.burakkutbay.springsecurityjwtexample.entity;
 
 import com.burakkutbay.springsecurityjwtexample.enums.Role;
+import com.burakkutbay.springsecurityjwtexample.token.Token;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,15 +24,18 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     Role role;
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String nameSurname;
+    private String name;
+    private String surName;
     private String username;
     private String password;
+    @OneToMany(mappedBy ="user" )
+    private List<Token> tokenList;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
+          return role.getAuthorities();
     }
 
     @Override

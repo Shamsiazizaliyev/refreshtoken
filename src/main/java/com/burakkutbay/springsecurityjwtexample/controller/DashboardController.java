@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class DashboardController {
     @GetMapping
     public ResponseEntity<String> helloWorld() {
+
         return ResponseEntity.ok("Welcome Dashboard");
     }
 }

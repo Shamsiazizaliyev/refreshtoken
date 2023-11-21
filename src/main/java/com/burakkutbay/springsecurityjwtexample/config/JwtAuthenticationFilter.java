@@ -1,5 +1,6 @@
 package com.burakkutbay.springsecurityjwtexample.config;
 
+import com.burakkutbay.springsecurityjwtexample.repository.TokenRepository;
 import com.burakkutbay.springsecurityjwtexample.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -24,27 +25,51 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final UserDetailsService userDetailsService;
 
+    private  final TokenRepository tokenRepository;
+
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         final String header = request.getHeader("Authorization");
+        System.out.println("filter");
+
+
         final String jwt;
         final String username;
         if (header == null || !header.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
+            System.out.println("filterden cixdi");
             return;
-        }
-        jwt = header.substring(7);
-        username = jwtService.findUsername(jwt);
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        }
+
+
+
+        jwt = header.substring(7);
+
+        System.out.println(jwt);
+        username = jwtService.findUsername(jwt);
+        System.out.println("filter davam edir");
+
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null)//username ve movcud  hesab olmaqin yoxluyur
+
+            {
+
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            if (jwtService.tokenControl(jwt, userDetails)) {
+
+            var isTokenValid=tokenRepository.findByToken(jwt)
+                    .map(token -> !token.isExpired()&&!token.isRevoked())
+                    .orElse(false);
+
+            if (jwtService.tokenControl(jwt, userDetails) && isTokenValid) {
+
+
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
         }
 
-        filterChain.doFilter(request, response);
+         filterChain.doFilter(request, response);
     }
 }
