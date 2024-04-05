@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 public class ManagementController {
 
 
-
     @GetMapping
     public String get() {
         return "GET:: management controller";

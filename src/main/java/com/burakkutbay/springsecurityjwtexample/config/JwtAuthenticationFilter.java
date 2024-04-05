@@ -22,10 +22,13 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
-
     private final UserDetailsService userDetailsService;
-
     private  final TokenRepository tokenRepository;
+
+
+
+
+
 
 
     @Override
@@ -54,6 +57,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null)//username ve movcud  hesab olmaqin yoxluyur
 
             {
+
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
